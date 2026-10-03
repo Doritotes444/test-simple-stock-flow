@@ -3,7 +3,7 @@
 > **Prueba Técnica de Desempeño SDD (Spec-Driven Development)**  
 > **Servicio Nacional de Aprendizaje (SENA) · Análisis y Desarrollo de Software (ADSO)**  
 > **Ficha:** 3413974  
-> **Desarrollador / Candidato:** Juan Esteban Doria (GitHub: [`Doritotes444`](https://github.com/Doritotes444))  
+> **Desarrollador / Candidato:** Juan Pablo Doria (GitHub: [`Doritotes444`](https://github.com/Doritotes444))  
 > **Stack Implementado:** PHP 8.2 (Laravel 11) + React 18 (Vite + TypeScript) + MySQL 8.4 LTS + Docker Compose  
 
 ---
