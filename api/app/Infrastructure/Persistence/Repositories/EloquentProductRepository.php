@@ -12,16 +12,26 @@ use App\Infrastructure\Persistence\Models\ProductModel;
 
 final class EloquentProductRepository implements ProductRepositoryInterface
 {
+    private array $versions = [];
+
     public function findById(string $id): ?Product
     {
         $model = ProductModel::withTrashed()->find($id);
-        return $model !== null ? ProductMapper::toDomain($model) : null;
+        if ($model !== null) {
+            $this->versions[$model->id] = (int) $model->version;
+            return ProductMapper::toDomain($model);
+        }
+        return null;
     }
 
     public function findActiveById(string $id): ?Product
     {
         $model = ProductModel::query()->find($id);
-        return $model !== null ? ProductMapper::toDomain($model) : null;
+        if ($model !== null) {
+            $this->versions[$model->id] = (int) $model->version;
+            return ProductMapper::toDomain($model);
+        }
+        return null;
     }
 
     public function searchPaginated(?string $search, ?string $categoryId, int $page, int $size): array
@@ -42,7 +52,11 @@ final class EloquentProductRepository implements ProductRepositoryInterface
             ->forPage($page, $size)
             ->get();
 
-        $items = $models->map(fn(ProductModel $m) => ProductMapper::toDomain($m))->all();
+        $items = [];
+        foreach ($models as $m) {
+            $this->versions[$m->id] = (int) $m->version;
+            $items[] = ProductMapper::toDomain($m);
+        }
 
         return [
             'items' => $items,
@@ -52,24 +66,29 @@ final class EloquentProductRepository implements ProductRepositoryInterface
 
     public function save(Product $product): void
     {
-        $existing = ProductModel::withTrashed()->find($product->id());
         $data = ProductMapper::toPersistence($product);
+        $id = $product->id();
 
-        if ($existing === null) {
+        if (!array_key_exists($id, $this->versions)) {
+            // New record
             $data['version'] = 1;
             ProductModel::query()->create($data);
+            $this->versions[$id] = 1;
         } else {
-            $currentVersion = (int) $existing->version;
+            // Existing record - apply optimistic locking
+            $currentVersion = $this->versions[$id];
             $data['version'] = $currentVersion + 1;
 
             $affected = ProductModel::query()
-                ->where('id', $product->id())
+                ->where('id', $id)
                 ->where('version', $currentVersion)
                 ->update($data);
 
             if ($affected === 0) {
                 throw new ConcurrencyConflictException();
             }
+            
+            $this->versions[$id] = $currentVersion + 1;
         }
     }
 
@@ -90,6 +109,7 @@ final class EloquentProductRepository implements ProductRepositoryInterface
 
     public function softDelete(string $id): void
     {
+        ProductModel::query()->where('id', $id)->update(['image_key' => null]);
         ProductModel::query()->where('id', $id)->delete();
     }
 }

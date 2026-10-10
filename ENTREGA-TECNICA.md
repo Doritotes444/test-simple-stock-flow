@@ -1,28 +1,28 @@
-ï»¿# Simple Stock Flow Â· DocumentaciÃ³n TÃ©cnica y Manual de Entrega
+# Simple Stock Flow · Documentación Técnica y Manual de Entrega
 
-> **Prueba TÃ©cnica de DesempeÃ±o SDD (Spec-Driven Development)**  
-> **Servicio Nacional de Aprendizaje (SENA) Â· AnÃ¡lisis y Desarrollo de Software (ADSO)**  
+> **Prueba Técnica de Desempeño SDD (Spec-Driven Development)**  
+> **Servicio Nacional de Aprendizaje (SENA) · Análisis y Desarrollo de Software (ADSO)**  
 > **Ficha:** 3413974  
 > **Desarrollador / Candidato:** Juan Pablo Doria (GitHub: [`Doritotes444`](https://github.com/Doritotes444))  
 > **Stack Implementado:** PHP 8.2 (Laravel 11) + React 18 (Vite + TypeScript) + MySQL 8.4 LTS + Docker Compose  
 
 ---
 
-## 1. Resumen Ejecutivo y MetodologÃ­a SDD
+## 1. Resumen Ejecutivo y Metodología SDD
 
-La prueba tÃ©cnica *Simple Stock Flow* evalÃºa la competencia en **Spec-Driven Development (SDD)**: la capacidad de tomar una especificaciÃ³n tÃ©cnica rigurosa (expresada conceptualmente en Python y .NET), interpretarla crÃ­ticamente sin sesgos ni suposiciones, y materializarla en un stack de producciÃ³n distinto (**PHP con Laravel** en el backend y **React con TypeScript** en el frontend).
+La prueba técnica *Simple Stock Flow* evalúa la competencia en **Spec-Driven Development (SDD)**: la capacidad de tomar una especificación técnica rigurosa (expresada conceptualmente en Python y .NET), interpretarla críticamente sin sesgos ni suposiciones, y materializarla en un stack de producción distinto (**PHP con Laravel** en el backend y **React con TypeScript** en el frontend).
 
 ### Principios Fundamentales Observados
-1. **El cÃ³digo es el medio, la especificaciÃ³n es la ley:** Se respetaron todas las reglas de negocio (RN-01 a RN-11), decisiones de producto (DP-01 a DP-04), invariantes monetarias y temporales, y el contrato OpenAPI / RFC 7807.
-2. **Dominio Puro (Arquitectura Onion / Hexagonal):** La capa de Dominio en PHP estÃ¡ 100% aislada de dependencias de frameworks (cero Eloquent, cero Laravel).
-3. **Persistencia Rigurosa en Motor Relacional:** Modelo en MySQL 8.4 LTS con 25 columnas exactas, 21 restricciones de integridad, 13 Ã­ndices y 9 checks de motor (ADR-001).
-4. **Ecosistema Modular de 6 Repositorios:** Repositorios clonados como hermanos con separaciÃ³n clara de responsabilidades.
+1. **El código es el medio, la especificación es la ley:** Se respetaron todas las reglas de negocio (RN-01 a RN-11), decisiones de producto (DP-01 a DP-04), invariantes monetarias y temporales, y el contrato OpenAPI / RFC 7807.
+2. **Dominio Puro (Arquitectura Onion / Hexagonal):** La capa de Dominio en PHP está 100% aislada de dependencias de frameworks (cero Eloquent, cero Laravel).
+3. **Persistencia Rigurosa en Motor Relacional:** Modelo en MySQL 8.4 LTS con 25 columnas exactas, 21 restricciones de integridad, 13 índices y 9 checks de motor (ADR-001).
+4. **Ecosistema Modular de 6 Repositorios:** Repositorios clonados como hermanos con separación clara de responsabilidades.
 
 ---
 
 ## 2. Diagramas de Arquitectura y Flujos
 
-### 2.1. Arquitectura Global de la SoluciÃ³n (Onion / Hexagonal)
+### 2.1. Arquitectura Global de la Solución (Onion / Hexagonal)
 
 ```mermaid
 flowchart TD
@@ -45,10 +45,10 @@ flowchart TD
             Ports["Puertos e Interfaces (Repositories, Hasher, Clock, Storage)"]
         end
 
-        subgraph DomainLayer["1. Domain (NÃºcleo PHP Puro)"]
+        subgraph DomainLayer["1. Domain (Núcleo PHP Puro)"]
             Entities["Entidades (Product, Sale, SaleItem, User, Category)"]
             ValueObjects["Value Objects (Money COP, Quantity, DateRange)"]
-            DomainExceptions["Excepciones de Negocio en EspaÃ±ol"]
+            DomainExceptions["Excepciones de Negocio en Español"]
         end
 
         subgraph InfrastructureLayer["3. Infrastructure"]
@@ -64,7 +64,7 @@ flowchart TD
     end
 
     Browser -->|HTTP :8080| Nginx
-    Nginx -->|Archivos EstÃ¡ticos| SPA
+    Nginx -->|Archivos Estáticos| SPA
     Nginx -->|Proxy /api/ y /media/| Controllers
     Controllers --> Requests
     Controllers --> Middleware
@@ -72,7 +72,7 @@ flowchart TD
     UseCases --> Ports
     UseCases --> Entities
     UseCases --> ValueObjects
-    Ports -.->|ImplementaciÃ³n| EloquentRepos
+    Ports -.->|Implementación| EloquentRepos
     EloquentRepos --> Mappers
     Mappers --> Entities
     EloquentRepos --> MySQL
@@ -81,13 +81,13 @@ flowchart TD
 
 ---
 
-### 2.2. Modelo Entidad-RelaciÃ³n de la Base de Datos
+### 2.2. Modelo Entidad-Relación de la Base de Datos
 
 ```mermaid
 erDiagram
     CATEGORIES ||--o{ PRODUCTS : "clasifica"
     USERS ||--o{ SALES : "registra como vendedor"
-    SALES ||--|{ SALE_ITEMS : "contiene lÃ­neas"
+    SALES ||--|{ SALE_ITEMS : "contiene líneas"
     PRODUCTS ||--o{ SALE_ITEMS : "se factura en"
 
     CATEGORIES {
@@ -161,7 +161,7 @@ sequenceDiagram
         UC->>UC: Validar reglas: stock suficiente, cantidad > 0
         UC->>UC: Product.deductStock(2) -> nuevo stock: 8
         
-        UC->>DB: Iniciar TransacciÃ³n de Base de Datos
+        UC->>DB: Iniciar Transacción de Base de Datos
         UC->>Repo: updateOptimistic(Product)
         Repo->>DB: UPDATE products SET stock = 8, version = 5 WHERE id = "P1" AND version = 4
         
@@ -169,13 +169,13 @@ sequenceDiagram
             DB-->>Repo: 1 fila afectada
             UC->>DB: INSERT INTO sales (...)
             UC->>DB: INSERT INTO sale_items (...)
-            UC->>DB: COMMIT TransacciÃ³n
-            DB-->>UC: TransacciÃ³n Confirmada
+            UC->>DB: COMMIT Transacción
+            DB-->>UC: Transacción Confirmada
             UC-->>API: SaleViewDTO (id, total, lines)
             API-->>Vendedor: 201 Created {"id": "sale-uuid-...", "total": 57000.00, ...}
         else Conflicto Concurrente (Filas afectadas = 0)
             DB-->>Repo: 0 filas afectadas
-            UC->>DB: ROLLBACK TransacciÃ³n
+            UC->>DB: ROLLBACK Transacción
             Note over UC: Pausa breve y siguiente reintento...
         end
     end
@@ -190,81 +190,81 @@ sequenceDiagram
 
 ## 3. Matriz de Trazabilidad: Reglas de Negocio y Decisiones
 
-| CÃ³digo | DescripciÃ³n de la Regla / DecisiÃ³n | Archivo de ImplementaciÃ³n | Comportamiento Verificado |
+| Código | Descripción de la Regla / Decisión | Archivo de Implementación | Comportamiento Verificado |
 |---|---|---|---|
-| **RN-01** | Nombre de producto Ãºnico y no vacÃ­o (mÃ¡x 150 caracteres). | `app/Domain/Entities/Product.php` y `CreateProductRequest.php` | ValidaciÃ³n en Request (400) y constraint UNIQUE en base de datos. |
-| **RN-02** | Precio de producto mayor a cero, en COP con 2 decimales. | `app/Domain/ValueObjects/Money.php` | Redondeo `ROUND_HALF_UP`, validaciÃ³n `price > 0`. |
-| **RN-03** | Stock mayor o igual a cero (entero no negativo). | `app/Domain/ValueObjects/Quantity.php` | `CHECK stock >= 0` en base de datos; excepciÃ³n si es negativo. |
-| **RN-04** | Producto debe pertenecer a una categorÃ­a vÃ¡lida existente. | `app/Domain/Entities/Category.php` y `EloquentProductRepository.php` | Clave forÃ¡nea `category_id` hacia tabla `categories`. |
-| **RN-05** | Imagen de producto opcional, mÃ¡x 5 MB, JPEG/PNG/WebP. | `app/Presentation/Requests/UploadImageRequest.php` | ValidaciÃ³n de tamaÃ±o y tipo MIME real; subida a `/media/`. |
-| **RN-06** | Soft Delete: productos con ventas no se eliminan fÃ­sicamente. | `app/Application/UseCases/SoftDeleteProductUseCase.php` | `deleted_at` timestamp; se oculta en catÃ¡logo, pero persiste en historial. |
-| **RN-07** | Venta no puede estar vacÃ­a; cantidad por Ã­tem > 0. | `app/Domain/Entities/Sale.php` | `EmptySaleException` si no hay lÃ­neas; `InvalidQuantityException`. |
+| **RN-01** | Nombre de producto único y no vacío (máx 150 caracteres). | `app/Domain/Entities/Product.php` y `CreateProductRequest.php` | Validación en Request (400) y constraint UNIQUE en base de datos. |
+| **RN-02** | Precio de producto mayor a cero, en COP con 2 decimales. | `app/Domain/ValueObjects/Money.php` | Redondeo `ROUND_HALF_UP`, validación `price > 0`. |
+| **RN-03** | Stock mayor o igual a cero (entero no negativo). | `app/Domain/ValueObjects/Quantity.php` | `CHECK stock >= 0` en base de datos; excepción si es negativo. |
+| **RN-04** | Producto debe pertenecer a una categoría válida existente. | `app/Domain/Entities/Category.php` y `EloquentProductRepository.php` | Clave foránea `category_id` hacia tabla `categories`. |
+| **RN-05** | Imagen de producto opcional, máx 5 MB, JPEG/PNG/WebP. | `app/Presentation/Requests/UploadImageRequest.php` | Validación de tamaño y tipo MIME real; subida a `/media/`. |
+| **RN-06** | Soft Delete: productos con ventas no se eliminan físicamente. | `app/Application/UseCases/SoftDeleteProductUseCase.php` | `deleted_at` timestamp; se oculta en catálogo, pero persiste en historial. |
+| **RN-07** | Venta no puede estar vacía; cantidad por ítem > 0. | `app/Domain/Entities/Sale.php` | `EmptySaleException` si no hay líneas; `InvalidQuantityException`. |
 | **RN-08** | No permitir productos duplicados en una misma venta. | `app/Domain/Entities/Sale.php` | `DuplicateSaleProductException` (400) si se repite `productId`. |
-| **RN-09** | DeducciÃ³n atÃ³mica de stock con verificaciÃ³n previa. | `app/Application/UseCases/RegisterSaleUseCase.php` | Si no hay stock suficiente, lanza `InsufficientStockException` (422). |
-| **RN-10** | Valores derivados (`subtotal`, `total`) calculados al vuelo. | `app/Domain/Entities/Sale.php` y `SaleItem.php` | No existen columnas `subtotal` ni `total` en BD (ArtÃ­culo VII). |
-| **RN-11** | Manejo de concurrencia y conflicto en stock simultÃ¡neo. | `app/Application/UseCases/RegisterSaleUseCase.php` | Bloqueo optimista con versiÃ³n y 3 reintentos. Retorna 409 en conflicto. |
-| **DP-01** | Reportes deben conservar el nombre histÃ³rico congelado. | `app/Infrastructure/Persistence/Repositories/DatabaseSalesReportQuery.php` | Subconsulta SQL particionada por producto en el rango `from`/`to`. |
-| **DP-02** | Rango de fechas con lÃ­mite superior exclusivo (`to` exclusive). | `app/Domain/ValueObjects/DateRange.php` | CondiciÃ³n SQL `sold_at >= :from AND sold_at < :to`. |
-| **DP-03** | PaginaciÃ³n por defecto de 20 elementos (mÃ¡ximo 100). | `app/Application/UseCases/GetProductCatalogUseCase.php` | PaginaciÃ³n estÃ¡ndar con DTO `PagedResultDTO`. |
+| **RN-09** | Deducción atómica de stock con verificación previa. | `app/Application/UseCases/RegisterSaleUseCase.php` | Si no hay stock suficiente, lanza `InsufficientStockException` (422). |
+| **RN-10** | Valores derivados (`subtotal`, `total`) calculados al vuelo. | `app/Domain/Entities/Sale.php` y `SaleItem.php` | No existen columnas `subtotal` ni `total` en BD (Artículo VII). |
+| **RN-11** | Manejo de concurrencia y conflicto en stock simultáneo. | `app/Application/UseCases/RegisterSaleUseCase.php` | Bloqueo optimista con versión y 3 reintentos. Retorna 409 en conflicto. |
+| **DP-01** | Reportes deben conservar el nombre histórico congelado. | `app/Infrastructure/Persistence/Repositories/DatabaseSalesReportQuery.php` | Subconsulta SQL particionada por producto en el rango `from`/`to`. |
+| **DP-02** | Rango de fechas con límite superior exclusivo (`to` exclusive). | `app/Domain/ValueObjects/DateRange.php` | Condición SQL `sold_at >= :from AND sold_at < :to`. |
+| **DP-03** | Paginación por defecto de 20 elementos (máximo 100). | `app/Application/UseCases/GetProductCatalogUseCase.php` | Paginación estándar con DTO `PagedResultDTO`. |
 | **DP-04** | Los administradores no pueden crear otros administradores. | `app/Application/UseCases/RegisterSellerUseCase.php` | Endpoint `/api/auth/register` fuerza inmutablemente `role = 'seller'`. |
 
 ---
 
-## 4. Conformidad con la ConstituciÃ³n SDD (13 ArtÃ­culos)
+## 4. Conformidad con la Constitución SDD (13 Artículos)
 
-* **ArtÃ­culo I (Dominio sin Framework):** `app/Domain/` contiene Ãºnicamente clases PHP nativas, sin `extends Model`, sin anotaciones y sin librerÃ­as externas.
-* **ArtÃ­culo II (Nombres de dominio independientes de la persistencia):** Entidades y campos modelan conceptos de negocio (`name`, `price`, `stock`).
-* **ArtÃ­culo III (Inmutabilidad de Value Objects):** `Money`, `Quantity` y `DateRange` son clases `readonly` que retornan nuevas instancias al operar.
-* **ArtÃ­culo IV (Transacciones atÃ³micas en Casos de Uso):** Se utiliza `UnitOfWorkInterface` respaldado por `DB::transaction()` de Laravel en `DatabaseUnitOfWork`.
-* **ArtÃ­culo V & ADR-001 (DueÃ±o del Esquema):** El motor MySQL arranca vacÃ­o; las migraciones de la API son la Ãºnica fuente de verdad DDL.
-* **ArtÃ­culo VI (Sin lÃ³gica de negocio en controladores ni vistas):** Los controladores Ãºnicamente mapean HTTP a DTOs y llaman a los casos de uso.
-* **ArtÃ­culo VII (Cero columnas derivadas):** Ni `sales` ni `sale_items` tienen campos calculados persistidos.
-* **ArtÃ­culo VIII (Seguridad RBAC y JWT):** ImplementaciÃ³n sin estados basada en tokens simÃ©tricos HS256 con claims `sub` y `role`.
-* **ArtÃ­culo IX (Cero secretos por defecto):** El cÃ³digo falla o requiere variables de entorno en producciÃ³n para `JWT_SIGNING_KEY` y `ADMIN_PASSWORD`.
-* **ArtÃ­culo X (ValidaciÃ³n estricta en el borde):** Form Requests validan payloads y retornan respuestas con formato normalizado `application/problem+json` (RFC 7807).
-* **ArtÃ­culo XI (Regla de los Dos Idiomas):** CÃ³digo fuente, variables, nombres de bases de datos y pruebas en **InglÃ©s**; mensajes de error para usuarios, respuestas de validaciÃ³n e interfaces visuales en **EspaÃ±ol** con acentos y puntuaciÃ³n formal.
-* **ArtÃ­culo XII (Idempotencia en herramientas de utilidad):** `ssf_tool` puede ejecutarse $N$ veces sin duplicar datos ni romper restricciones.
-* **ArtÃ­culo XIII (DocumentaciÃ³n completa con 5 preguntas):** Cada uno de los repositorios posee un `README.md` que responde detalladamente las 5 preguntas requeridas.
+* **Artículo I (Dominio sin Framework):** `app/Domain/` contiene únicamente clases PHP nativas, sin `extends Model`, sin anotaciones y sin librerías externas.
+* **Artículo II (Nombres de dominio independientes de la persistencia):** Entidades y campos modelan conceptos de negocio (`name`, `price`, `stock`).
+* **Artículo III (Inmutabilidad de Value Objects):** `Money`, `Quantity` y `DateRange` son clases `readonly` que retornan nuevas instancias al operar.
+* **Artículo IV (Transacciones atómicas en Casos de Uso):** Se utiliza `UnitOfWorkInterface` respaldado por `DB::transaction()` de Laravel en `DatabaseUnitOfWork`.
+* **Artículo V & ADR-001 (Dueño del Esquema):** El motor MySQL arranca vacío; las migraciones de la API son la única fuente de verdad DDL.
+* **Artículo VI (Sin lógica de negocio en controladores ni vistas):** Los controladores únicamente mapean HTTP a DTOs y llaman a los casos de uso.
+* **Artículo VII (Cero columnas derivadas):** Ni `sales` ni `sale_items` tienen campos calculados persistidos.
+* **Artículo VIII (Seguridad RBAC y JWT):** Implementación sin estados basada en tokens simétricos HS256 con claims `sub` y `role`.
+* **Artículo IX (Cero secretos por defecto):** El código falla o requiere variables de entorno en producción para `JWT_SIGNING_KEY` y `ADMIN_PASSWORD`.
+* **Artículo X (Validación estricta en el borde):** Form Requests validan payloads y retornan respuestas con formato normalizado `application/problem+json` (RFC 7807).
+* **Artículo XI (Regla de los Dos Idiomas):** Código fuente, variables, nombres de bases de datos y pruebas en **Inglés**; mensajes de error para usuarios, respuestas de validación e interfaces visuales en **Español** con acentos y puntuación formal.
+* **Artículo XII (Idempotencia en herramientas de utilidad):** `ssf_tool` puede ejecutarse $N$ veces sin duplicar datos ni romper restricciones.
+* **Artículo XIII (Documentación completa con 5 preguntas):** Cada uno de los repositorios posee un `README.md` que responde detalladamente las 5 preguntas requeridas.
 
 ---
 
-## 5. CatÃ¡logo de Endpoints REST Implementados
+## 5. Catálogo de Endpoints REST Implementados
 
-Todos los endpoints respetan el contrato de respuesta y cÃ³digos de estado:
+Todos los endpoints respetan el contrato de respuesta y códigos de estado:
 
-| MÃ©todo | Endpoint | AutenticaciÃ³n / Rol | CÃ³digos HTTP Retornados | DescripciÃ³n |
+| Método | Endpoint | Autenticación / Rol | Códigos HTTP Retornados | Descripción |
 |---|---|---|---|---|
-| `GET` | `/health` | PÃºblico | `200` | Sonda de salud que responde `{"status":"ok"}`. |
-| `POST` | `/api/auth/login` | PÃºblico | `200`, `400`, `401 (vacÃ­o)` | Inicio de sesiÃ³n; retorna `accessToken`, `role`, `username`. |
-| `POST` | `/api/auth/register` | `admin` | `201`, `400`, `401 (vacÃ­o)`, `403 (vacÃ­o)` | Registro de nuevo vendedor (fuerza rol `seller` DP-04). |
-| `GET` | `/api/categories` | Autenticado | `200`, `401 (vacÃ­o)` | Listado de las 5 categorÃ­as semilla fijas. |
-| `GET` | `/api/products` | Autenticado | `200`, `400`, `401 (vacÃ­o)` | CatÃ¡logo paginado con filtros (`search`, `categoryId`). |
-| `GET` | `/api/products/{id}` | Autenticado | `200`, `401 (vacÃ­o)`, `404 (vacÃ­o)` | Detalle de un producto por su UUID. |
-| `POST` | `/api/products` | `admin` | `201`, `400`, `401 (vacÃ­o)`, `403 (vacÃ­o)` | CreaciÃ³n de nuevo producto en el catÃ¡logo. |
-| `PUT` | `/api/products/{id}` | `admin` | `200`, `400`, `401 (vacÃ­o)`, `403 (vacÃ­o)`, `404 (vacÃ­o)` | ActualizaciÃ³n de datos de un producto existente. |
-| `DELETE` | `/api/products/{id}` | `admin` | `204`, `401 (vacÃ­o)`, `403 (vacÃ­o)`, `404 (vacÃ­o)` | EliminaciÃ³n lÃ³gica (Soft Delete). |
-| `POST` | `/api/products/{id}/image`| `admin` | `200`, `400`, `401 (vacÃ­o)`, `403 (vacÃ­o)` | Subida de imagen (mÃ¡x 5 MB, multipart/form-data). |
-| `GET` | `/media/{key}` | PÃºblico | `200`, `404 (vacÃ­o)` | Descarga directa de archivos de imagen persistidos. |
-| `POST` | `/api/sales` | Autenticado | `201`, `400`, `401 (vacÃ­o)`, `409`, `422` | Registro atÃ³mico de venta con deducciÃ³n de stock. |
-| `GET` | `/api/sales` | Autenticado | `200`, `400`, `401 (vacÃ­o)` | Historial paginado filtrado por rango `from`/`to`. |
-| `GET` | `/api/sales/{id}` | Autenticado | `200`, `401 (vacÃ­o)`, `404 (vacÃ­o)` | Comprobante detallado con lÃ­neas y nombres congelados. |
-| `GET` | `/api/reports/sales` | Autenticado | `200`, `400`, `401 (vacÃ­o)` | Reporte consolidado con mÃ©tricas y desglose de productos. |
+| `GET` | `/health` | Público | `200` | Sonda de salud que responde `{"status":"ok"}`. |
+| `POST` | `/api/auth/login` | Público | `200`, `400`, `401 (vacío)` | Inicio de sesión; retorna `accessToken`, `role`, `username`. |
+| `POST` | `/api/auth/register` | `admin` | `201`, `400`, `401 (vacío)`, `403 (vacío)` | Registro de nuevo vendedor (fuerza rol `seller` DP-04). |
+| `GET` | `/api/categories` | Autenticado | `200`, `401 (vacío)` | Listado de las 5 categorías semilla fijas. |
+| `GET` | `/api/products` | Autenticado | `200`, `400`, `401 (vacío)` | Catálogo paginado con filtros (`search`, `categoryId`). |
+| `GET` | `/api/products/{id}` | Autenticado | `200`, `401 (vacío)`, `404 (vacío)` | Detalle de un producto por su UUID. |
+| `POST` | `/api/products` | `admin` | `201`, `400`, `401 (vacío)`, `403 (vacío)` | Creación de nuevo producto en el catálogo. |
+| `PUT` | `/api/products/{id}` | `admin` | `200`, `400`, `401 (vacío)`, `403 (vacío)`, `404 (vacío)` | Actualización de datos de un producto existente. |
+| `DELETE` | `/api/products/{id}` | `admin` | `204`, `401 (vacío)`, `403 (vacío)`, `404 (vacío)` | Eliminación lógica (Soft Delete). |
+| `POST` | `/api/products/{id}/image`| `admin` | `200`, `400`, `401 (vacío)`, `403 (vacío)` | Subida de imagen (máx 5 MB, multipart/form-data). |
+| `GET` | `/media/{key}` | Público | `200`, `404 (vacío)` | Descarga directa de archivos de imagen persistidos. |
+| `POST` | `/api/sales` | Autenticado | `201`, `400`, `401 (vacío)`, `409`, `422` | Registro atómico de venta con deducción de stock. |
+| `GET` | `/api/sales` | Autenticado | `200`, `400`, `401 (vacío)` | Historial paginado filtrado por rango `from`/`to`. |
+| `GET` | `/api/sales/{id}` | Autenticado | `200`, `401 (vacío)`, `404 (vacío)` | Comprobante detallado con líneas y nombres congelados. |
+| `GET` | `/api/reports/sales` | Autenticado | `200`, `400`, `401 (vacío)` | Reporte consolidado con métricas y desglose de productos. |
 
 ---
 
-## 6. GuÃ­a de Despliegue y EvaluaciÃ³n Paso a Paso
+## 6. Guía de Despliegue y Evaluación Paso a Paso
 
 ### 6.1. Requisitos Previos
-- **Docker Desktop** (con Docker Compose v2+) instalado y en ejecuciÃ³n en el sistema.
+- **Docker Desktop** (con Docker Compose v2+) instalado y en ejecución en el sistema.
 - Los 6 repositorios clonados como hermanos en una misma carpeta:
   ```
   parent_folder/
-  â”œâ”€â”€ test-simple-stock-flow-api/
-  â”œâ”€â”€ test-simple-stock-flow-app/
-  â”œâ”€â”€ test-simple-stock-flow-docs/
-  â”œâ”€â”€ test-simple-stock-flow-infra/
-  â”œâ”€â”€ test-simple-stock-flow-page/
-  â””â”€â”€ test-simple-stock-flow-tool/
+  +-- test-simple-stock-flow-api/
+  +-- test-simple-stock-flow-app/
+  +-- test-simple-stock-flow-docs/
+  +-- test-simple-stock-flow-infra/
+  +-- test-simple-stock-flow-page/
+  +-- test-simple-stock-flow-tool/
   ```
 
 ### 6.2. Levantamiento del Entorno Completo
@@ -275,12 +275,12 @@ cd test-simple-stock-flow-infra
 # 2. Levantar los contenedores en segundo plano
 docker compose up -d --build
 
-# 3. Comprobar que los servicios estÃ©n sanos (healthy)
+# 3. Comprobar que los servicios estén sanos (healthy)
 docker compose ps
 ```
 
-### 6.3. VerificaciÃ³n Automatizada (Sondas P-01 a P-42)
-Ejecutar el script de verificaciÃ³n segÃºn el sistema operativo:
+### 6.3. Verificación Automatizada (Sondas P-01 a P-07)
+Ejecutar el script de verificación según el sistema operativo:
 * **En Linux / macOS / Git Bash:**
   ```bash
   ./verify.sh
@@ -290,7 +290,7 @@ Ejecutar el script de verificaciÃ³n segÃºn el sistema operativo:
   .\verify.ps1
   ```
 
-### 6.4. Sembrado de Datos de DemostraciÃ³n (Opcional)
+### 6.4. Sembrado de Datos de Demostración (Opcional)
 ```bash
 cd ../test-simple-stock-flow-tool
 docker build -t ssf-tool .
@@ -298,21 +298,21 @@ docker run --rm --network host ssf-tool seed
 ```
 
 ### 6.5. Accesos a las Interfaces
-- **AplicaciÃ³n Web Principal (SPA):** [http://localhost:8080](http://localhost:8080)
+- **Aplicación Web Principal (SPA):** [http://localhost:8080](http://localhost:8080)
 - **Credenciales Iniciales:**
-  - Administrador: Usuario `admin@stockflow.com` (o `admin`) / ContraseÃ±a `Admin12345!`
-- **PÃ¡gina PÃºblica EstÃ¡tica:** Abrir `test-simple-stock-flow-page/index.html` en cualquier navegador.
+  - Administrador: Usuario `admin@stockflow.com` (o `admin`) / Contraseña `Admin12345!`
+- **Página Pública Estática:** Abrir `test-simple-stock-flow-page/index.html` en cualquier navegador.
 - **Backend API:** [http://localhost:8000](http://localhost:8000)
 
 ---
 
 ## 7. Estructura de Repositorios en GitHub
 
-Todos los repositorios estÃ¡n versionados y actualizados en la cuenta del evaluado:
+Todos los repositorios están versionados y actualizados en la cuenta del evaluado:
 
-1. **DocumentaciÃ³n y EspecificaciÃ³n:** [https://github.com/Doritotes444/test-simple-stock-flow-docs](https://github.com/Doritotes444/test-simple-stock-flow-docs)
+1. **Documentación y Especificación:** [https://github.com/Doritotes444/test-simple-stock-flow-docs](https://github.com/Doritotes444/test-simple-stock-flow-docs)
 2. **Backend API (Laravel):** [https://github.com/Doritotes444/test-simple-stock-flow-api](https://github.com/Doritotes444/test-simple-stock-flow-api)
 3. **Frontend SPA (React):** [https://github.com/Doritotes444/test-simple-stock-flow-app](https://github.com/Doritotes444/test-simple-stock-flow-app)
 4. **Infraestructura (Docker):** [https://github.com/Doritotes444/test-simple-stock-flow-infra](https://github.com/Doritotes444/test-simple-stock-flow-infra)
-5. **Sitio EstÃ¡tico (Landing):** [https://github.com/Doritotes444/test-simple-stock-flow-page](https://github.com/Doritotes444/test-simple-stock-flow-page)
+5. **Sitio Estático (Landing):** [https://github.com/Doritotes444/test-simple-stock-flow-page](https://github.com/Doritotes444/test-simple-stock-flow-page)
 6. **Herramienta CLI (Seeder):** [https://github.com/Doritotes444/test-simple-stock-flow-tool](https://github.com/Doritotes444/test-simple-stock-flow-tool)
