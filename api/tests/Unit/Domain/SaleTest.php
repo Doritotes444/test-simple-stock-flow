@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 declare(strict_types=1);
 
@@ -23,17 +23,55 @@ final class SaleTest extends TestCase
             'user-1111-1111-1111-111111111111',
             'admin'
         );
+    
+    /**
+     * RN-07: Una venta registrada no se modifica ni se anula
+     */
+    public function test_rn_07_sale_aggregate_has_no_mutators(): void
+    {
+        $reflection = new \ReflectionClass(Sale::class);
+        $forbiddenPrefixes = ['set', 'remove', 'delete', 'update', 'cancel'];
+        
+        foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+            foreach ($forbiddenPrefixes as $prefix) {
+                $this->assertStringStartsNotWith(
+                    $prefix, 
+                    $method->getName(), 
+                    "RN-07 Violation: Sale aggregate should not have mutator method {$method->getName()}"
+                );
+            }
+        }
     }
+}
 
     /**
-     * RN-04: Una venta tiene al menos una lÃ­nea
+     * RN-04: Una venta tiene al menos una línea
      */
     public function test_rn_04_sale_without_lines_fails_confirmation(): void
     {
         $sale = $this->createSale();
         $this->expectException(EmptySaleException::class);
         $sale->ensureConfirmable();
+    
+    /**
+     * RN-07: Una venta registrada no se modifica ni se anula
+     */
+    public function test_rn_07_sale_aggregate_has_no_mutators(): void
+    {
+        $reflection = new \ReflectionClass(Sale::class);
+        $forbiddenPrefixes = ['set', 'remove', 'delete', 'update', 'cancel'];
+        
+        foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+            foreach ($forbiddenPrefixes as $prefix) {
+                $this->assertStringStartsNotWith(
+                    $prefix, 
+                    $method->getName(), 
+                    "RN-07 Violation: Sale aggregate should not have mutator method {$method->getName()}"
+                );
+            }
+        }
     }
+}
 
     /**
      * RN-05: Un producto no se repite dentro de una misma venta
@@ -53,10 +91,29 @@ final class SaleTest extends TestCase
 
         $this->expectException(DuplicateSaleProductException::class);
         $sale->addItem($prod, Quantity::of(2), 'Abarrotes');
+    
+    /**
+     * RN-07: Una venta registrada no se modifica ni se anula
+     */
+    public function test_rn_07_sale_aggregate_has_no_mutators(): void
+    {
+        $reflection = new \ReflectionClass(Sale::class);
+        $forbiddenPrefixes = ['set', 'remove', 'delete', 'update', 'cancel'];
+        
+        foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+            foreach ($forbiddenPrefixes as $prefix) {
+                $this->assertStringStartsNotWith(
+                    $prefix, 
+                    $method->getName(), 
+                    "RN-07 Violation: Sale aggregate should not have mutator method {$method->getName()}"
+                );
+            }
+        }
     }
+}
 
     /**
-     * RN-06 & RN-12: Precio congelado y cÃ¡lculo dinÃ¡mico del total
+     * RN-06 & RN-12: Precio congelado y cálculo dinámico del total
      */
     public function test_rn_06_and_rn_12_frozen_price_and_dynamic_total_calculation(): void
     {
@@ -65,14 +122,52 @@ final class SaleTest extends TestCase
         $prod2 = Product::create('p-2', 'Leche', Money::of(3500.0), 5, 'c-2');
 
         $sale->addItem($prod1, Quantity::of(2), 'Abarrotes'); // 4000
-        $sale->addItem($prod2, Quantity::of(1), 'LÃ¡cteos');   // 3500
+        $sale->addItem($prod2, Quantity::of(1), 'Lácteos');   // 3500
 
         $this->assertSame(7500.0, $sale->total()->amount());
         $this->assertSame(8, $prod1->stock());
         $this->assertSame(4, $prod2->stock());
 
-        // Modificar precio posterior del producto no altera la lÃ­nea congelada
+        // Modificar precio posterior del producto no altera la línea congelada
         $prod1->changePrice(Money::of(5000.0));
         $this->assertSame(7500.0, $sale->total()->amount());
+    
+    /**
+     * RN-07: Una venta registrada no se modifica ni se anula
+     */
+    public function test_rn_07_sale_aggregate_has_no_mutators(): void
+    {
+        $reflection = new \ReflectionClass(Sale::class);
+        $forbiddenPrefixes = ['set', 'remove', 'delete', 'update', 'cancel'];
+        
+        foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+            foreach ($forbiddenPrefixes as $prefix) {
+                $this->assertStringStartsNotWith(
+                    $prefix, 
+                    $method->getName(), 
+                    "RN-07 Violation: Sale aggregate should not have mutator method {$method->getName()}"
+                );
+            }
+        }
+    }
+}
+
+    /**
+     * RN-07: Una venta registrada no se modifica ni se anula
+     */
+    public function test_rn_07_sale_aggregate_has_no_mutators(): void
+    {
+        $reflection = new \ReflectionClass(Sale::class);
+        $forbiddenPrefixes = ['set', 'remove', 'delete', 'update', 'cancel'];
+        
+        foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+            foreach ($forbiddenPrefixes as $prefix) {
+                $this->assertStringStartsNotWith(
+                    $prefix, 
+                    $method->getName(), 
+                    "RN-07 Violation: Sale aggregate should not have mutator method {$method->getName()}"
+                );
+            }
+        }
     }
 }

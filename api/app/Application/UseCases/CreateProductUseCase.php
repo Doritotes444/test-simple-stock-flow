@@ -7,6 +7,7 @@ namespace App\Application\UseCases;
 use App\Application\DTOs\CreateProductDTO;
 use App\Application\Ports\Outbound\CategoryRepositoryInterface;
 use App\Application\Ports\Outbound\ProductRepositoryInterface;
+use App\Application\Ports\Outbound\UnitOfWorkInterface;
 use App\Domain\Entities\Product;
 use App\Domain\Exceptions\CategoryNotFoundException;
 use App\Domain\ValueObjects\Money;
@@ -15,7 +16,8 @@ final class CreateProductUseCase
 {
     public function __construct(
         private readonly ProductRepositoryInterface $productRepository,
-        private readonly CategoryRepositoryInterface $categoryRepository
+        private readonly CategoryRepositoryInterface $categoryRepository,
+        private readonly UnitOfWorkInterface $uow
     ) {}
 
     public function execute(CreateProductDTO $dto): string
@@ -35,7 +37,9 @@ final class CreateProductUseCase
             $dto->categoryId
         );
 
-        $this->productRepository->save($product);
+        $this->uow->transaction(function () use ($product) {
+            $this->productRepository->save($product);
+        });
 
         return $id;
     }
